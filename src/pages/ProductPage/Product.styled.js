@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { mobile } from "../../components/style/Responsive";
+import { Button } from "../../components/shared";
 
 export const Container = styled.div``;
 export const ProductWrapper = styled.div`

@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Link as LinkR } from "react-router-dom";
 import { mobile } from "../../components/style/Responsive";
 
 export const Container = styled.div`

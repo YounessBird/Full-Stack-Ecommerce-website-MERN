@@ -1,11 +1,8 @@
 import React from "react";
 import { Add, Remove } from "@material-ui/icons";
 import { Announcement, Footer, Header, Newsletter } from "../../components";
-import { Button } from "../../components/shared";
 import {
   Container,
-  Header,
-  Announcement,
   ProductWrapper,
   ImgContainer,
   Image,
@@ -21,6 +18,7 @@ import {
   FilterSizeOption,
   AddContainer,
   Amount,
+  AmountContainer,
   ProdButton,
 } from "./Product.styled";
 
