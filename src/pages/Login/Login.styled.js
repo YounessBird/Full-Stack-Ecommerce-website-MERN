@@ -41,3 +41,7 @@ export const FormLinks = styled(LinkR)`
   font-size: 12px;
   cursor: pointer;
 `;
+export const Error = styled.div`
+  color: red;
+  padding: 15px;
+`;
