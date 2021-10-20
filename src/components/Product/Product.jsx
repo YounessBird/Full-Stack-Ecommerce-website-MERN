@@ -1,4 +1,5 @@
 import React from "react";
+import { Link as LinkR } from "react-router-dom";
 import {
   ShoppingCartOutlined,
   SearchOutlined,
@@ -14,9 +15,11 @@ const Product = ({ item }) => {
         <Icon>
           <ShoppingCartOutlined />
         </Icon>
-        <Icon>
-          <SearchOutlined />
-        </Icon>
+        <LinkR to={`/product/${item._id}`} style={{ color: "black" }}>
+          <Icon>
+            <SearchOutlined />
+          </Icon>
+        </LinkR>
         <Icon>
           <FavoriteBorderOutlined />
         </Icon>
