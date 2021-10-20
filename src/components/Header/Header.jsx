@@ -1,5 +1,6 @@
 import React from "react";
 import { Link as LinkR } from "react-router-dom";
+import { useSelector } from "react-redux";
 import SearchIcon from "@mui/icons-material/Search";
 import Badge from "@mui/material/Badge";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
@@ -17,6 +18,7 @@ import {
 } from "./Header.styled";
 import { Logo } from "../shared";
 const Header = () => {
+  const quantity = useSelector((state) => state.cart.quantity);
   return (
     <NavBar>
       <NavContainer>
@@ -41,9 +43,11 @@ const Header = () => {
             <NavLinks>Sign In</NavLinks>
           </NavItem>
           <NavItem>
-            <Badge badgeContent={4} color="secondary">
-              <ShoppingCartOutlinedIcon color="action" />
-            </Badge>
+            <LinkR to="/cart">
+              <Badge badgeContent={quantity} color="secondary">
+                <ShoppingCartOutlinedIcon color="action" />
+              </Badge>
+            </LinkR>
           </NavItem>
         </NavMenu>
       </NavContainer>

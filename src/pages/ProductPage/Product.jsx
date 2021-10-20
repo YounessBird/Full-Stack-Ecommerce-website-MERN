@@ -1,4 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router";
+import { useDispatch } from "react-redux";
+import { v4 as uuidv4 } from "uuid";
+import { addProduct } from "../../components/redux/cartSlice";
 import { Add, Remove } from "@material-ui/icons";
 import { Announcement, Footer, Header, Newsletter } from "../../components";
 import {
@@ -23,48 +27,93 @@ import {
 } from "./Product.styled";
 
 const Product = () => {
+  const productId = useParams();
+  const [product, setProduct] = useState({});
+  const [amount, setAmount] = useState(1);
+  const [color, setColor] = useState("");
+  const [size, setSize] = useState("");
+  const dispatch = useDispatch();
+
+  const TOKEN =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MTYyM2MzOGVjMmRlYjI5OGVmMjI1YTkiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE2MzQyODg3NDEsImV4cCI6MTYzNDU0Nzk0MX0.4E-S-dFYYZFAyeuG2G12sAOr8DjykptHnR16Wkpah_w";
+
+  const handleClick = (type) => () => {
+    type == "dec" ? amount > 1 && setAmount(amount - 1) : setAmount(amount + 1);
+  };
+  const handleColor = (ev) => {
+    setColor(ev.target.attributes.color.value);
+  };
+  const handleSize = (ev) => {
+    console.log(ev.target.value);
+    setSize(ev.target.value);
+  };
+  const addToCart = () => {
+    const prodCartID = uuidv4();
+    //product, amount, color, size
+    //product: [], quantity: 0, total: 0,
+    dispatch(
+      addProduct({
+        ...product,
+        prodCartID,
+        color,
+        size,
+        amount,
+      })
+    );
+  };
+
+  useEffect(() => {
+    (async () => {
+      const getProduct = await fetch(
+        `http://localhost:5000/api/product/find/${productId["id"]}`,
+        {
+          headers: {
+            "auth-token": `Bearer ${TOKEN}`,
+          },
+        }
+      )
+        .then((res) => res.ok && res)
+        .then((res) => res.json())
+        .catch((err) => err);
+      setProduct(getProduct);
+    })();
+  }, [productId]);
+
   return (
     <Container>
       <Header />
       <Announcement />
       <ProductWrapper>
         <ImgContainer>
-          <Image src="https://i.ibb.co/S6qMxwr/jean.jpg" />
+          <Image src={product.img} />
         </ImgContainer>
         <InfoContainer>
-          <Title>Denim Jumpsuit</Title>
-          <Desc>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta,
-            molestiae. Cum incidunt quam aspernatur dolores odio sequi.
-            Similique aliquam voluptate eos, mollitia dolorem non placeat sed
-            eligendi nulla optio sequi!
-          </Desc>
-          <Price>$ 20</Price>
+          <Title>{product.title}</Title>
+          <Desc>{product.desc}</Desc>
+          <Price>$ {product.price}</Price>
           <FilterContainer>
             <Filter>
               <FilterTitle>Color</FilterTitle>
-              <FilterColor color="black" />
-              <FilterColor color="darkblue" />
-              <FilterColor color="gray" />
+              {product.color?.map((c) => (
+                <FilterColor color={c} key={c} onClick={handleColor} />
+              ))}
             </Filter>
             <Filter>
               <FilterTitle>Size</FilterTitle>
-              <FilterSize>
-                <FilterSizeOption>XS</FilterSizeOption>
-                <FilterSizeOption>S</FilterSizeOption>
-                <FilterSizeOption>M</FilterSizeOption>
-                <FilterSizeOption>L</FilterSizeOption>
-                <FilterSizeOption>XL</FilterSizeOption>
+              <FilterSize onChange={handleSize}>
+                {product.size?.map((s) => (
+                  <FilterSizeOption key={s}>{s}</FilterSizeOption>
+                ))}
               </FilterSize>
             </Filter>
           </FilterContainer>
           <AddContainer>
             <AmountContainer>
-              <Remove />
-              <Amount>1</Amount>
-              <Add />
+              <Remove onClick={handleClick("dec")} />
+              <Amount>{amount}</Amount>
+              <Add onClick={handleClick("inc")} />
             </AmountContainer>
-            <ProdButton>ADD TO CART</ProdButton>
+            <ProdButton onClick={addToCart}>ADD TO CART</ProdButton>
           </AddContainer>
         </InfoContainer>
       </ProductWrapper>

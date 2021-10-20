@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ThemeProvider } from "styled-components";
 import GlobalStyle from "./components/style/GlobalStyle";
 import { theme } from "./components/style/theme";
+import { useSelector } from "react-redux";
 import {
   Home,
   ProductsList,
@@ -19,6 +20,7 @@ import {
   Redirect,
 } from "react-router-dom";
 const App = () => {
+  const user = useSelector((state) => state.user.currentUser);
 
   return (
     <ThemeProvider theme={theme}>
@@ -30,6 +32,7 @@ const App = () => {
           <Route exact path="/product/:id" component={Product} />
           <Route exact path="/cart" component={Cart} />
           <Route exact path="/login">
+            {user?.response == "success" ? <Redirect to="/" /> : <Login />}
           </Route>
           <Route exact path="/register" component={Register} />
           <Route exact path="/success" component={Success} />
