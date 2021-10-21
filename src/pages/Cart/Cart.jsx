@@ -3,6 +3,7 @@ import { Add, Remove } from "@mui/icons-material";
 import { Announcement, Footer, Header, Newsletter } from "../../components";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router";
+import StripeCheckout from "react-stripe-checkout";
 import axios from "axios";
 import {
   Container,
@@ -40,6 +41,7 @@ import {
   removeItem,
 } from "../../components/redux/cartSlice";
 
+const stripKey = process.env.REACT_APP_STRIPE;
 
 const Cart = () => {
   //HANDELING STATE WITH REDUX
@@ -55,6 +57,29 @@ const Cart = () => {
   // ROUTES
   const history = useHistory();
 
+  //Stripe handling
+  const [stripetoken, setStripeToken] = useState(null);
+  const onToken = (token) => {
+    setStripeToken(token);
+  };
+  useEffect(() => {
+    const makeRequest = async () => {
+      try {
+        const res = await axios
+          .post("http://localhost:5000/api/checkout/payment", {
+            tokenId: stripetoken.id,
+            amount: data.total * 100,
+          })
+          .then((response) => {
+            // Do something with the response
+            history.push("/success", { data: response.data });
+          });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    stripetoken && makeRequest();
+  }, [stripetoken, data.total]);
   return (
     <Container>
       <Header />
@@ -131,9 +156,23 @@ const Cart = () => {
               <SummaryItemText>Total</SummaryItemText>
               <SummaryItemPrice>$ {data.total}</SummaryItemPrice>
             </SummaryItem>
+            <StripeCheckout
+              token={onToken}
+              stripeKey={stripKey}
+              name="Logo Co." // the pop-in header title
+              description="Big Data Stuff" // the pop-in header subtitle
+              image="https://stripe.com/img/documentation/checkout/marketplace.png"
+              amount={data.total * 100} // convert to cents
+              currency="USD"
+              shippingAddress
+              billingAddress={true}
+              // cause zipCheck to be pulled from billing address (set to shipping if none provided).
+              zipCode={true}
+            >
               <CheckoutButton action large>
                 CHECKOUT NOW
               </CheckoutButton>
+            </StripeCheckout>
           </OrderSummary>
         </CartDashboard>
       </CartContainer>
