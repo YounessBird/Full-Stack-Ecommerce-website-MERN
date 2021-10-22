@@ -1,34 +1,38 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Product from "../Product/Product";
+import {
+  useGetByCategoryQuery,
+  useGetAllProductsQuery,
+} from "../../Services/apiCalls";
+
 const Products = ({ category, filters, sort }) => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
 
+  const {
+    data: productsByCategories,
+    error: categoryError,
+    isLoading: isBycategoryLoading,
+  } = useGetByCategoryQuery(category, { skip: category ? false : true });
+
+  const {
+    data: AllProducts,
+    error: allProductsError,
+    isLoading: isAllProductsLoading,
+  } = useGetAllProductsQuery(null, { skip: category ? true : false });
+
   useEffect(() => {
-    // first check if cat is changed and then get prods based on cat
-    (async () => {
-      //   GET PRODUCTS BY CATEGORY
-      const getByCategories = await fetch(
-        `http://localhost:5000/api/product?category=${category}`
-      )
-        .then((res) => {
-          if (res.ok) return res;
-        })
-        .then((res) => res.json())
-        .catch((err) => err);
-
-      //GET ALL PRODUCTS
-      const getAllProducts = await fetch(`http://localhost:5000/api/product`)
-        .then((res) => {
-          if (res.ok) return res;
-        })
-        .then((res) => res.json())
-        .catch((err) => err);
-
-      category ? setProducts(getByCategories) : setProducts(getAllProducts);
-    })();
-  }, [category]);
+    if (category) {
+      if (productsByCategories) {
+        setProducts(productsByCategories);
+      }
+    } else {
+      if (AllProducts) {
+        setProducts(AllProducts);
+      }
+    }
+  }, [category, productsByCategories, AllProducts]);
 
   useEffect(() => {
     category &&

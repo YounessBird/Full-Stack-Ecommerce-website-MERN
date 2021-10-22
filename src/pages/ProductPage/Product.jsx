@@ -25,6 +25,7 @@ import {
   AmountContainer,
   ProdButton,
 } from "./Product.styled";
+import { useGetProductQuery } from "../../Services/apiCalls";
 
 const Product = () => {
   const productId = useParams();
@@ -62,22 +63,13 @@ const Product = () => {
     );
   };
 
+  const { data, error, isLoading } = useGetProductQuery(productId["id"], {});
+
   useEffect(() => {
-    (async () => {
-      const getProduct = await fetch(
-        `http://localhost:5000/api/product/find/${productId["id"]}`,
-        {
-          headers: {
-            "auth-token": `Bearer ${TOKEN}`,
-          },
-        }
-      )
-        .then((res) => res.ok && res)
-        .then((res) => res.json())
-        .catch((err) => err);
-      setProduct(getProduct);
-    })();
-  }, [productId]);
+    if (data) {
+      setProduct(data);
+    }
+  }, [data]);
 
   return (
     <Container>
